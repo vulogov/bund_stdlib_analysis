@@ -285,9 +285,9 @@ dependencies = [
 
 [[package]]
 name = "bundcore"
-version = "0.6.0"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dfec298d44969184194901722a289a9afc6c881a27dbf264458ac7039b18f3c3"
+checksum = "7498fc5ffced60dcc2ee4a85750104f3df6698fa57f1fd8682c0e3d371e822a4"
 dependencies = [
  "bund_language_parser",
  "easy-error",
