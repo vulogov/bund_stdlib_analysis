@@ -1,0 +1,18 @@
+[package]
+name = "bund_stdlib_analysis"
+version = "0.1.0"
+edition = "2021"
+description = "Numeric and text analysis for BUND programming language"
+license-file = "LICENSE"
+repository = "https://github.com/vulogov/bund_stdlib_analysis"
+categories = ["compilers"]
+keywords = ["language", "stack", "concatenative", "lambda", "dynamic"]
+exclude = ["examples", "Models", "Documentation", ".*"]
+
+[dependencies]
+bundcore = ">=0.*.*"
+easy-error = "1.0.0"
+lazy_static = "1.5.0"
+log = "0.4.28"
+rust_dynamic = ">=0.*.*"
+rust_multistackvm = ">=0.*.*"
