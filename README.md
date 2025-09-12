@@ -37,3 +37,4 @@ The following call will return a LIST value:
 | analysis.breakouts | `Data`<br/>`minimum size` | `List of breakout points`<br/> | Search for breakouts in the data sample |
 | analysis.outliers.mad | `Data`<br/>`Data`<br/>`sensitivity` | `Dict with information about outliers`<br/> | Search for outliers in two samples using MAD algorithm |
 | analysis.outliers.dbscan | `Data`<br/>`Data`<br/>`sensitivity` | `Dict with information about outliers`<br/> | Search for outliers in two samples using DBSCAN algorithm |
+| analysis.forecast.markov | `Data`<br/> | `Next value` | Forecasting next value in the sample using Markov Chain algorithm
