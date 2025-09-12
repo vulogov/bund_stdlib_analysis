@@ -11,6 +11,7 @@ pub mod breakout;
 
 pub fn init_lib(vm: &mut Bund) -> Result<&Bund, Error> {
     let _ = vm.vm.register_inline("analysis.anomalies".to_string(), analysis_anomalies);
+    let _ = vm.vm.register_inline("analysis.breakouts".to_string(), analysis_breakouts);
     let _ = vm.vm.register_inline("analysis.outliers".to_string(), analysis_outliers);
     let _ = vm.vm.register_alias("analysis.outliers.mad".to_string(), "analysis.outliers".to_string());
     let _ = vm.vm.register_inline("analysis.outliers.dbscan".to_string(), analysis_outliers_dbscan);

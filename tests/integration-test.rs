@@ -80,4 +80,26 @@ mod tests {
         println!("{}", &res);
     }
 
+    #[test]
+    fn test_integration_breakouts() {
+        let script = r#"
+        [
+            1.1 1.2 1.3 1.11 1.22 1.33
+            2.1 2.2 2.3 1.111 1.222 1.333
+        ]
+            2 analysis.breakouts
+        "#;
+        let mut bund = Bund::new();
+        let _ = init_lib(&mut bund);
+        match bund.eval(script) {
+            Ok(_) => {}
+            Err(err) => {
+                println!("{:?}", &err);
+            }
+        }
+        let res = bund.vm.stack.pull().unwrap();
+        println!("{}", &res);
+        assert_eq!(res.len(), 2 as usize);
+    }
+
 }

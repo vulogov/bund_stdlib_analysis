@@ -5,7 +5,7 @@ use bundcore::{common, common_get_data};
 use rust_dynamic::value::Value;
 use rust_multistackvm::multistackvm::{VM, StackOps};
 
-use crate::anomalies;
+use crate::{anomalies, breakout};
 
 #[derive(Debug, Clone)]
 pub enum OutliersMode {
@@ -118,4 +118,44 @@ pub fn analysis_outliers(vm: &mut VM) -> std::result::Result<&mut VM, Error> {
 
 pub fn analysis_outliers_dbscan(vm: &mut VM) -> std::result::Result<&mut VM, Error> {
     analysis_outliers_generic(vm, OutliersMode::DBSCAN)
+}
+
+pub fn analysis_breakouts(vm: &mut VM) -> std::result::Result<&mut VM, Error> {
+    if vm.stack.current_stack_len() < 2 {
+        bail!("Stack is too shallow for inline ANALYSIS.BREAKOUTS");
+    }
+
+    let ms_value = match vm.stack.pull() {
+        Some(ms_value) => ms_value,
+        None => bail!("ANOMALIES: error getting min-size"),
+    };
+
+    let ms = match ms_value.cast_int() {
+        Ok(ms) => ms,
+        Err(err) => {
+            bail!("analysis.breakouts returned for #1: {}", err);
+        }
+    };
+
+    let data = match common_get_data::get_data(vm, StackOps::FromStack, common::SourceMode::Consume, "ANALYSIS.BREAKOUTS".to_string()) {
+        Ok(data) => data,
+        Err(err) => {
+            bail!("ANOMALIES: error getting data: {}", err);
+        }
+    };
+
+    if data.len() == 0 {
+        bail!("ANOMALIES: NO DATA for analysis");
+    }
+
+    let breakouts_data = match breakout::detect_breakouts(data, ms as usize) {
+        Ok(breakouts_data) => breakouts_data,
+        Err(err) => bail!("{}", err),
+    };
+    let mut res = Value::list();
+    for n in breakouts_data.iter() {
+        res = res.push(Value::from_float(*n as f64));
+    }
+    vm.stack.push(res);
+    Ok(vm)
 }
