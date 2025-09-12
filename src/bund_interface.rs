@@ -7,6 +7,12 @@ use rust_multistackvm::multistackvm::{VM, StackOps};
 
 use crate::anomalies;
 
+#[derive(Debug, Clone)]
+pub enum OutliersMode {
+    MAD,
+    DBSCAN,
+}
+
 pub fn analysis_anomalies(vm: &mut VM) -> std::result::Result<&mut VM, Error> {
     if vm.stack.current_stack_len() < 2 {
         bail!("Stack is too shallow for inline ANALYSIS.ANOMALIES");
@@ -46,4 +52,70 @@ pub fn analysis_anomalies(vm: &mut VM) -> std::result::Result<&mut VM, Error> {
     }
     vm.stack.push(res);
     Ok(vm)
+}
+
+pub fn analysis_outliers_generic(vm: &mut VM, op: OutliersMode) -> std::result::Result<&mut VM, Error> {
+    if vm.stack.current_stack_len() < 3 {
+        bail!("Stack is too shallow for inline ANALYSIS.OUTLIERS");
+    }
+
+    let sensitivity_value = match vm.stack.pull() {
+        Some(period_value) => period_value,
+        None => bail!("OUTLIERS: error getting sensitivity"),
+    };
+
+    let sensitivity = match sensitivity_value.cast_float() {
+        Ok(period) => period,
+        Err(err) => {
+            bail!("analysis.outliers returned for #1: {}", err);
+        }
+    };
+
+    let data1 = match common_get_data::get_data(vm, StackOps::FromStack, common::SourceMode::Consume, "ANALYSIS.OUTLIERS".to_string()) {
+        Ok(data) => data,
+        Err(err) => {
+            bail!("OUTLIERS: error getting data #1: {}", err);
+        }
+    };
+
+    if data1.len() == 0 {
+        bail!("OUTLIERS: NO DATA #1 for analysis");
+    }
+
+    let data2 = match common_get_data::get_data(vm, StackOps::FromStack, common::SourceMode::Consume, "ANALYSIS.OUTLIERS".to_string()) {
+        Ok(data) => data,
+        Err(err) => {
+            bail!("OUTLIERS: error getting data #2: {}", err);
+        }
+    };
+
+    if data2.len() == 0 {
+        bail!("OUTLIERS: NO DATA #2 for analysis");
+    }
+
+    match op {
+        OutliersMode::MAD => {
+            let outliers_data = match anomalies::detect_outliers(data1, data2, sensitivity) {
+                Ok(outliers_data) => outliers_data,
+                Err(err) => bail!("{}", err),
+            };
+            vm.stack.push(outliers_data);
+        }
+        OutliersMode::DBSCAN => {
+            let outliers_data = match anomalies::detect_outliers_dbscan(data1, data2, sensitivity) {
+                Ok(outliers_data) => outliers_data,
+                Err(err) => bail!("{}", err),
+            };
+            vm.stack.push(outliers_data);
+        }
+    }
+    Ok(vm)
+}
+
+pub fn analysis_outliers(vm: &mut VM) -> std::result::Result<&mut VM, Error> {
+    analysis_outliers_generic(vm, OutliersMode::MAD)
+}
+
+pub fn analysis_outliers_dbscan(vm: &mut VM) -> std::result::Result<&mut VM, Error> {
+    analysis_outliers_generic(vm, OutliersMode::DBSCAN)
 }
