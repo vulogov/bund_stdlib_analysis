@@ -9,6 +9,7 @@ pub mod bund_interface;
 pub mod anomalies;
 pub mod breakout;
 pub mod forecast;
+pub mod estimate;
 
 
 pub fn init_lib(vm: &mut Bund) -> Result<&Bund, Error> {
@@ -22,6 +23,13 @@ pub fn init_lib(vm: &mut Bund) -> Result<&Bund, Error> {
     let _ = vm.vm.register_inline("analysis.forecast.markov.".to_string(), markov::stdlib_forecast_wb_consume_markov);
     let _ = vm.vm.register_inline("analysis.forecast.markov,".to_string(), markov::stdlib_forecast_stack_keep_markov);
     let _ = vm.vm.register_inline("analysis.forecast.markov.,".to_string(), markov::stdlib_forecast_wb_keep_markov);
+    // ESTIMATE
+    let _ = vm.vm.register_inline("analysis.estimate".to_string(), estimate::stdlib_forecast_estimate_stack);
+    let _ = vm.vm.register_inline("analysis.estimate.".to_string(), estimate::stdlib_forecast_estimate_wb);
+    let _ = vm.vm.register_inline("analysis.estimate.uncertainty".to_string(), estimate::stdlib_forecast_estimate_uncertainty_stack);
+    let _ = vm.vm.register_inline("analysis.estimate.uncertainty.".to_string(), estimate::stdlib_forecast_estimate_uncertainty_wb);
+    let _ = vm.vm.register_inline("analysis.estimate!".to_string(), estimate::stdlib_forecast_estimate_analysis_stack);
+    let _ = vm.vm.register_inline("analysis.estimate!.".to_string(), estimate::stdlib_forecast_estimate_analysis_wb);
     Ok(vm)
 }
 
