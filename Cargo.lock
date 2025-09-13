@@ -288,7 +288,7 @@ dependencies = [
 
 [[package]]
 name = "bund_stdlib_analysis"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "anomaly_detection",
  "augurs",
